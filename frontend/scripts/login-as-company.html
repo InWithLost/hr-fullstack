@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход как пользователь с компанией</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .success {
+            color: #4CAF50;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Вход как пользователь с компанией</h1>
+    <p>Нажмите кнопку ниже, чтобы создать пользователя с компанией (не админа) в localStorage:</p>
+    
+    <button onclick="createCompanyUser()">Создать пользователя с компанией</button>
+    
+    <div id="result"></div>
+    
+    <div class="info">
+        <h3>Данные пользователя:</h3>
+        <ul>
+            <li><strong>Email:</strong> company@example.com</li>
+            <li><strong>Роль:</strong> company</li>
+            <li><strong>Имя:</strong> Иван Петров</li>
+        </ul>
+        
+        <h3>Данные компании:</h3>
+        <ul>
+            <li><strong>Название:</strong> ООО "Тестовая компания"</li>
+            <li><strong>Местоположение:</strong> Москва</li>
+            <li><strong>Отрасль:</strong> IT</li>
+            <li><strong>Баланс:</strong> 15000 руб.</li>
+            <li><strong>Бесплатные размещения:</strong> 2</li>
+        </ul>
+    </div>
+    
+    <script>
+        function createCompanyUser() {
+            // Данные пользователя
+            const user = {
+                id: 123,
+                name: 'Иван Петров',
+                email: 'company@example.com',
+                role: 'company',
+                token: 'demo-company-token'
+            };
+
+            // Данные компании
+            const company = {
+                id: 456,
+                name: 'ООО "Тестовая компания"',
+                description: 'Тестовая компания для демонстрации функционала',
+                location: 'Москва',
+                industry: 'IT',
+                website: 'https://example.com',
+                phone: '+7 (123) 456-78-90',
+                balance: 15000,
+                free_job_postings: 2
+            };
+
+            // Сохраняем данные в localStorage
+            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('company', JSON.stringify(company));
+            localStorage.setItem('token', user.token);
+
+            // Удаляем данные администратора, если они есть
+            localStorage.removeItem('admin_managing_company');
+
+            // Выводим результат
+            document.getElementById('result').innerHTML = '<p class="success">Пользователь с компанией успешно создан!</p>' +
+                '<p>Теперь вы можете перейти на <a href="http://localhost:3000" target="_blank">http://localhost:3000</a> и войти как пользователь с компанией.</p>';
+        }
+    </script>
+</body>
+</html>

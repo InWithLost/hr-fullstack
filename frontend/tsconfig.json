@@ -1,0 +1,17 @@
+{
+  // https://nuxt.com/docs/guide/concepts/typescript
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": true,
+    "types": [
+      "@pinia/nuxt",
+      "@types/node"
+    ],
+    "paths": {
+      "#app": ["./.nuxt/types/app"],
+      "#head": ["./.nuxt/types/head"],
+      "#vue": ["./node_modules/vue"]
+    }
+  }
+} 
