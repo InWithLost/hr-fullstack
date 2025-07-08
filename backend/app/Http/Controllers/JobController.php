@@ -42,9 +42,14 @@ class JobController extends Controller
             'description' => 'required|string',
             'salary_from' => 'nullable|integer',
             'salary_to' => 'nullable|integer',
-            'company_id' => 'required|exists:companies,id',
+            'company_id' => 'sometimes|exists:companies,id',
             'specialty_id' => 'required|exists:specialties,id',
         ]);
+
+        $validated['company_id'] = $validated['company_id'] ?? $user->companies()->value('companies.id');
+        if (! $validated['company_id']) {
+            return response()->json(['message' => 'Company not found'], 422);
+        }
 
         $validated['slug'] = Str::slug($validated['title']) . '-' . Str::random(6);
 

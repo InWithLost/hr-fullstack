@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Application;
+use App\Models\Company;
 
 class User extends Authenticatable
 {
@@ -52,5 +53,15 @@ class User extends Authenticatable
     public function applications()
     {
         return $this->hasMany(Application::class);
+    }
+
+    public function companies()
+    {
+        return $this->belongsToMany(Company::class)->withPivot('is_owner')->withTimestamps();
+    }
+
+    public function isOwnerOf(Company $company): bool
+    {
+        return $this->companies()->wherePivot('is_owner', true)->where('company_id', $company->id)->exists();
     }
 }
