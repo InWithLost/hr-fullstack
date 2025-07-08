@@ -58,43 +58,20 @@ const selectedEmploymentType = ref('')
 const cities = ['Москва', 'Санкт-Петербург', 'Новосибирск', 'Екатеринбург', 'Казань']
 const employmentTypes = ['Полная занятость', 'Частичная занятость', 'Удаленная работа']
 
-// Временные данные для примера
-const jobs = ref([
-  {
-    id: 1,
-    title: 'Врач-терапевт',
-    location: {
-      city: 'Москва',
-      district: 'Ховрино'
-    },
-    salary: '120 000',
-    requirements: [
-      'Высшее медицинское образование',
-      'Опыт работы от 3 лет',
-      'Наличие действующего сертификата'
-    ],
-    employmentType: 'Полная занятость',
-    experience: 'от 3 лет',
-    slug: 'therapist-moscow'
-  },
-  {
-    id: 2,
-    title: 'Медицинская сестра',
-    location: {
-      city: 'Санкт-Петербург',
-      district: 'Петроградский'
-    },
-    salary: '80 000',
-    requirements: [
-      'Среднее медицинское образование',
-      'Опыт работы от 1 года',
-      'Наличие действующего сертификата'
-    ],
-    employmentType: 'Полная занятость',
-    experience: 'от 1 года',
-    slug: 'nurse-spb'
+const config = useRuntimeConfig()
+
+const { data: fetchedJobs } = await useFetch(`${config.public.apiBase}/api/v1/jobs`, {
+  transform: (d) => d.data ?? d,
+})
+
+const jobs = ref((fetchedJobs.value || []).map(j => ({
+  ...j,
+  salary: j.salary_from && j.salary_to ? `${j.salary_from}–${j.salary_to}` : j.salary_from ?? '',
+  location: {
+    city: j.city || '-',
+    district: j.district || ''
   }
-])
+})))
 
 const filteredJobs = computed(() => {
   return jobs.value.filter(job => {

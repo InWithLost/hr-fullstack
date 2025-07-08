@@ -4,9 +4,9 @@
       <div class="flex justify-between items-start mb-4">
         <div>
           <h3 class="text-xl font-semibold mb-2">{{ job.title }}</h3>
-          <p class="text-gray-600">{{ job.location.city }}, {{ job.location.district }}</p>
+          <p class="text-gray-600">{{ job.location?.city || job.city || '-' }}<span v-if="job.location?.district || job.district">, {{ job.location?.district || job.district }}</span></p>
         </div>
-        <span class="text-blue-600 font-semibold">{{ job.salary }} ₽</span>
+        <span class="text-blue-600 font-semibold">{{ formattedSalary }}</span>
       </div>
       
       <div class="mb-4">
@@ -53,5 +53,14 @@ defineProps({
       slug: ''
     })
   }
+})
+
+const props = defineProps(['job'])
+
+const formattedSalary = computed(() => {
+  if (props.job.salary) return `${props.job.salary} ₽`
+  if (props.job.salary_from && props.job.salary_to) return `${props.job.salary_from}–${props.job.salary_to} ₽`
+  if (props.job.salary_from) return `от ${props.job.salary_from} ₽`
+  return ''
 })
 </script> 
