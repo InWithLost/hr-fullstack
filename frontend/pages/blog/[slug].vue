@@ -83,50 +83,22 @@ import StarRating from '~/components/StarRating.vue'
 import { useNotification } from '~/stores/notification'
 const route = useRoute()
 const notification = useNotification()
+const config = useRuntimeConfig()
 
-const post = ref({
-  title: 'Как стать успешным врачом-терапевтом',
-  date: '15 марта 2024',
-  readTime: 5,
-  category: 'Карьера в медицине',
-  image: '/images/blog/therapist-career.jpg',
-  content: `
-    <p>В современном мире профессия врача-терапевта остается одной из самых востребованных и уважаемых. Однако, чтобы стать действительно успешным специалистом, недостаточно просто получить медицинское образование.</p>
-    
-    <h2>1. Непрерывное обучение</h2>
-    <p>Медицина постоянно развивается, появляются новые методы диагностики и лечения. Успешный врач-терапевт должен постоянно следить за новинками в своей области, посещать конференции и семинары, читать специализированную литературу.</p>
-    
-    <h2>2. Развитие коммуникативных навыков</h2>
-    <p>Умение общаться с пациентами - один из ключевых навыков терапевта. Важно научиться слушать, сопереживать и доступно объяснять сложные медицинские термины.</p>
-    
-    <h2>3. Организационные навыки</h2>
-    <p>Терапевт должен уметь эффективно планировать свое время, вести документацию и координировать работу с другими специалистами.</p>
-  `
+const { data: fetchedPost } = await useFetch(`${config.public.apiBase}/api/v1/blog/${route.params.slug}`)
+
+const post = ref({ ...fetchedPost.value, date: fetchedPost.value ? new Date(fetchedPost.value.published_at || fetchedPost.value.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : undefined })
+
+// fetch related posts (simple: same category, different slug)
+const { data: related } = await useFetch(`${config.public.apiBase}/api/v1/blog`, {
+  query: { category: post.value.category },
+  transform: (d) => (d.data || []).filter(p => p.slug !== route.params.slug).slice(0,3)
 })
 
-// Временные данные для примера
-const relatedPosts = ref([
-  {
-    id: 2,
-    title: 'Топ-10 медицинских специальностей 2024 года',
-    excerpt: 'Обзор самых востребованных медицинских специальностей в 2024 году, их требования и перспективы развития.',
-    image: '/images/blog/top-medical-specialties.jpg',
-    category: 'Образование',
-    date: '10 марта 2024',
-    readTime: 7,
-    slug: 'top-10-medical-specialties-2024'
-  },
-  {
-    id: 3,
-    title: 'Как подготовиться к собеседованию в медицинскую клинику',
-    excerpt: 'Практические советы по подготовке к собеседованию в медицинскую клинику, включая типичные вопросы и ответы.',
-    image: '/images/blog/medical-interview.jpg',
-    category: 'Советы соискателям',
-    date: '5 марта 2024',
-    readTime: 4,
-    slug: 'how-to-prepare-for-medical-interview'
-  }
-])
+const relatedPosts = ref((related.value || []).map(p => ({
+  ...p,
+  date: new Date(p.published_at || p.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+})))
 
 // Функция обновления рейтинга
 const updateRating = (value) => {
@@ -134,20 +106,26 @@ const updateRating = (value) => {
   post.value.rating = value
   
   // В реальном приложении здесь был бы API-запрос для сохранения рейтинга
-  /* Пример API-запроса
   try {
-    await fetch(`http://localhost:8000/api/blog/${route.params.slug}/rate`, {
+    await $fetch(`${config.public.apiBase}/api/v1/blog/${route.params.slug}/rate`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify({ rating: value })
+      body: { rating: value },
     })
   } catch (error) {
     console.error('Ошибка при сохранении рейтинга:', error)
     notification.error('Не удалось сохранить вашу оценку')
+    return
   }
+
+  /*
+  await fetch(`http://localhost:8000/api/blog/${route.params.slug}/rate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    },
+    body: JSON.stringify({ rating: value })
+  })
   */
   
   notification.success('Ваша оценка сохранена')

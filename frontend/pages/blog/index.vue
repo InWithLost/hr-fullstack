@@ -50,39 +50,15 @@ const categories = [
   'Новости медицины'
 ]
 
-// Временные данные для примера
-const posts = ref([
-  {
-    id: 1,
-    title: 'Как стать успешным врачом-терапевтом',
-    excerpt: 'В этой статье мы расскажем о том, какие навыки и знания необходимы для успешной карьеры врача-терапевта, и как их развивать.',
-    image: '/images/blog/therapist-career.jpg',
-    category: 'Карьера в медицине',
-    date: '15 марта 2024',
-    readTime: 5,
-    slug: 'how-to-become-successful-therapist'
-  },
-  {
-    id: 2,
-    title: 'Топ-10 медицинских специальностей 2024 года',
-    excerpt: 'Обзор самых востребованных медицинских специальностей в 2024 году, их требования и перспективы развития.',
-    image: '/images/blog/top-medical-specialties.jpg',
-    category: 'Образование',
-    date: '10 марта 2024',
-    readTime: 7,
-    slug: 'top-10-medical-specialties-2024'
-  },
-  {
-    id: 3,
-    title: 'Как подготовиться к собеседованию в медицинскую клинику',
-    excerpt: 'Практические советы по подготовке к собеседованию в медицинскую клинику, включая типичные вопросы и ответы.',
-    image: '/images/blog/medical-interview.jpg',
-    category: 'Советы соискателям',
-    date: '5 марта 2024',
-    readTime: 4,
-    slug: 'how-to-prepare-for-medical-interview'
-  }
-])
+const config = useRuntimeConfig()
+const { data: fetchedPosts } = await useFetch(`${config.public.apiBase}/api/v1/blog`, {
+  transform: (data) => data.data ?? data
+})
+
+const posts = ref((fetchedPosts.value || []).map(p => ({
+  ...p,
+  date: new Date(p.published_at || p.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+})))
 
 const filteredPosts = computed(() => {
   return posts.value.filter(post => {

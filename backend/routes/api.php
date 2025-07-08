@@ -5,6 +5,7 @@ use App\Http\Controllers\JobController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanyManagerController;
+use App\Http\Controllers\BlogController;
 
 Route::prefix('v1')->group(function () {
     // Public
@@ -13,6 +14,9 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/jobs', [JobController::class, 'index']);
     Route::get('/jobs/{job:slug}', [JobController::class, 'show']);
+    Route::get('/blog', [BlogController::class, 'index']);
+    Route::get('/blog/{blog:slug}', [BlogController::class, 'show']);
+    Route::post('/blog/{blog:slug}/rate', [BlogController::class, 'rate']);
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
@@ -33,5 +37,10 @@ Route::prefix('v1')->group(function () {
 
         Route::post('/jobs/{job}/apply', [JobController::class, 'apply']);
         Route::post('/applications/{application}/withdraw', [JobController::class, 'withdraw']);
+
+        // inside auth group for admin actions
+        Route::post('/blog', [BlogController::class, 'store']);
+        Route::put('/blog/{blog}', [BlogController::class, 'update']);
+        Route::delete('/blog/{blog}', [BlogController::class, 'destroy']);
     });
 });
