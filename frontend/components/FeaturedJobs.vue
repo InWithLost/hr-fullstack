@@ -24,58 +24,18 @@
 
 <script setup>
 // Временные данные для примера
-const featuredJobs = ref([
-  {
-    id: 1,
-    title: 'Врач-терапевт',
-    location: {
-      city: 'Москва',
-      district: 'Ховрино'
-    },
-    salary: '120 000',
-    requirements: [
-      'Высшее медицинское образование',
-      'Опыт работы от 3 лет',
-      'Наличие действующего сертификата'
-    ],
-    employmentType: 'Полная занятость',
-    experience: 'от 3 лет',
-    slug: 'therapist-moscow'
-  },
-  {
-    id: 2,
-    title: 'Медицинская сестра',
-    location: {
-      city: 'Санкт-Петербург',
-      district: 'Петроградский'
-    },
-    salary: '80 000',
-    requirements: [
-      'Среднее медицинское образование',
-      'Опыт работы от 1 года',
-      'Наличие действующего сертификата'
-    ],
-    employmentType: 'Полная занятость',
-    experience: 'от 1 года',
-    slug: 'nurse-spb'
-  },
-  {
-    id: 3,
-    title: 'Врач-кардиолог',
-    location: {
-      city: 'Новосибирск',
-      district: 'Центральный'
-    },
-    salary: '150 000',
-    requirements: [
-      'Высшее медицинское образование',
-      'Опыт работы от 5 лет',
-      'Наличие действующего сертификата',
-      'Специализация по кардиологии'
-    ],
-    employmentType: 'Полная занятость',
-    experience: 'от 5 лет',
-    slug: 'cardiologist-nsk'
+const config = useRuntimeConfig()
+
+const { data: fetchedFeatured } = await useFetch(`${config.public.apiBase}/api/v1/jobs`, {
+  transform: (d) => (d.data ?? d).slice(0,3)
+})
+
+const featuredJobs = ref((fetchedFeatured.value || []).map(j => ({
+  ...j,
+  salary: j.salary_from && j.salary_to ? `${j.salary_from}–${j.salary_to}` : j.salary_from ?? '',
+  location: {
+    city: j.city || '-',
+    district: j.district || ''
   }
-])
+})))
 </script> 

@@ -49,7 +49,8 @@ const customConfig = {
       const formData = new FormData()
       formData.append('file', blobInfo.blob(), blobInfo.filename())
 
-      const response = await fetch('http://localhost:8000/api/admin/files/upload', {
+      const config = useRuntimeConfig()
+      const response = await fetch(`${config.public.apiBase}/api/v1/admin/files/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
