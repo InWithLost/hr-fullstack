@@ -83,6 +83,7 @@ const notificationStore = useNotification()
 const isDragging = ref(false)
 const imageUrl = ref(props.value)
 const imagePath = ref('')
+const fileId = ref(null)
 
 const handleFileSelect = (event) => {
   const file = event.target.files[0]
@@ -104,7 +105,8 @@ const uploadFile = async (file) => {
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await fetch('http://localhost:8000/api/admin/files/upload', {
+    const config = useRuntimeConfig()
+    const response = await fetch(`${config.public.apiBase}/api/v1/admin/files/upload`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -116,6 +118,7 @@ const uploadFile = async (file) => {
       const data = await response.json()
       imageUrl.value = data.url
       imagePath.value = data.path
+      fileId.value = data.id
       emit('update:value', data.url)
       emit('upload', data)
       notificationStore.success('Изображение успешно загружено')
@@ -132,7 +135,8 @@ const uploadFile = async (file) => {
 const removeImage = async () => {
   if (imagePath.value) {
     try {
-      const response = await fetch('http://localhost:8000/api/admin/files', {
+      const config = useRuntimeConfig()
+      const response = await fetch(`${config.public.apiBase}/api/v1/files/${fileId.value}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -144,6 +148,7 @@ const removeImage = async () => {
       if (response.ok) {
         imageUrl.value = ''
         imagePath.value = ''
+        fileId.value = null
         emit('update:value', '')
         emit('upload', null)
         notificationStore.success('Изображение успешно удалено')

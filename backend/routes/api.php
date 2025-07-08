@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanyManagerController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\FileController;
 
 Route::prefix('v1')->group(function () {
     // Public
@@ -42,5 +43,10 @@ Route::prefix('v1')->group(function () {
         Route::post('/blog', [BlogController::class, 'store']);
         Route::put('/blog/{blog}', [BlogController::class, 'update']);
         Route::delete('/blog/{blog}', [BlogController::class, 'destroy']);
+
+        Route::post('/files/upload', [FileController::class, 'upload']);
+        Route::delete('/files/{file}', [FileController::class, 'destroy']);
+        // admin alias
+        Route::post('/admin/files/upload', [FileController::class, 'upload']);
     });
 });
